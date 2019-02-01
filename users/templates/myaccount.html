@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+  Hi {{ user.username }}! you have {{ user.posts }} posts, and gave {{ user.likes }} thumbs up!
+
+  <ul>
+  {% for post in posts_list %}
+  
+    <li>{{ post.post_text }}</li>
+  {% endfor %}
+  </ul>
+
+  <p><a href="{% url 'logout' %}">logout</a></p>
+{% else %}
+  <p>You are not logged in</p>
+  <a href="{% url 'login' %}">login</a> or <a href="{% url 'users:signup' %}">signup</a>
+{% endif %}
+{% endblock %}

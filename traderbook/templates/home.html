@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+  Hi {{ user.username }}! you have {{ user.posts }} posts, and gave {{ user.likes }} thumbs up!
+  <p><a href="{% url 'logout' %}">logout</a></p>
+  <meta http-equiv="refresh" content="0; URL='{% url 'users:myaccount' %}'" />
+{% else %}
+  <p>You are not logged in</p>
+  <a href="{% url 'login' %}">login</a> or <a href="{% url 'users:usersignup' %}">signup</a>
+{% endif %}
+{% endblock %}
