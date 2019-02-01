@@ -1,0 +1,4 @@
+django
+clearbit
+djangorestframework
+djangorestframework-simplejwt
