@@ -15,6 +15,7 @@ In order to automatically test API functionality, you should use rest of .bat fi
 All .bat files run appropriate classes from bot_functions.py file, with some user input.
 
 .bat file explanations:
+
 0. Runs server
 1. makes .config and writes token to file
 2. Accepts user input and writes requested configuration to file.
