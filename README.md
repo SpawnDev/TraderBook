@@ -40,3 +40,20 @@ And Emailhunter by running its test function:
 
 	bf.emailhunter()
 
+# Feedback notes:
+
+*API keys hardcoded inline* Fixed, now it uses environment variables to read API keys.
+
+*Mixed tabs and spaces across files* Fixed, standardized everything to use tabs.
+
+*Shipped SQLite file with applied migrations* Previously, I shipped it like this to make setup more convenient, but after further reading, now I understand why is it bad practice. Fixed.
+
+*CamelCase top-level function names* Fixed, didn't pay enough attention to it, updated to lower_case_with_underscores as advised in PEP-8
+
+*Post and like counts are prone to RC* I am not quite sure what did you mean by RC abbreviation.
+
+*Too much print code. It’s not a production code, but it’s not a helloworld personal project either* Fixed, As someone who's been mainly working on personal projects, I do agree I use print code more often than I should. Definitely should have addressed that before sending out.
+
+*Batch scripts* Fixed, working on personal projects and scripts did accustom me some to bad practices. Actively working on overcoming it.
+
+*Way overkilled batch scripts* New update, fresh with 100% less batch scripts!
