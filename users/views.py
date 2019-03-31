@@ -5,7 +5,7 @@ from django.views import generic
 from django.test.client import RequestFactory
 
 from django.shortcuts import render, redirect
-import requests, json, clearbit, sys
+import requests, json, clearbit, sys, os
 
 from django.http import HttpResponse
 from django.template import loader
@@ -17,49 +17,44 @@ from rest_framework.permissions import IsAuthenticated
 
 from .models import User, Post, Like
 
-def clearData(email):
-	clearbit.key = 'sk_1f384bd939bf8ad7dcd711a4d6859c3c'
+def clear_data(email):
+	clearbit.key = os.environ["CLEARBIT"]
 
 	email = email
 	lookup = clearbit.Enrichment.find(email=email, stream=True)
-
 	if lookup != None:
-		print('Email found!')
 		name = str(lookup['person']["name"]["givenName"])
 		surname = str(lookup['person']["name"]["familyName"])
 		rez = [name, surname]
 		return rez
 	else:
-		print('Email not found')
 		return ["null", "null"]
 
 
-def myaccount(request):
-	print("Radi eheheeee!!")
+def my_account(request):
 	posts_list = Post.objects.order_by("-created")
 	template = loader.get_template("myaccount.html")
 	context = {"posts_list": posts_list}
 	return HttpResponse(template.render(context, request))
 
-def emailcheck(email):
-	req = {"api_key":"82000e0248ddba37454fae879dcfd7ee1a7742d5", "email":email}
+def email_check(email):
+	key = os.environ["EMAILHUNTER"]
+	req = {"api_key":key, "email":email}
 	odg = requests.get("https://api.hunter.io/v2/email-verifier", params=req)
 	data = odg.json()
 	data = data["data"]
-	print("Shit tekst - " + str(data["gibberish"]))
-	print("SMTP check - " + str(data["smtp_check"]))
 	if (data["gibberish"] == False and data["smtp_check"] == True):
 		return True
 	else:
+		print("Email check is NOT valid.")
 		return False
 
 def signup(request):
 	if request.method == 'POST':
 		form = SignupForm(request.POST)
-		print(request.POST.get('email'))
-		huntercheck = emailcheck(request.POST.get('email'))
+		huntercheck = email_check(request.POST.get('email'))
 		if form.is_valid() and huntercheck == True:
-			lookup = clearData(request.POST.get('email'))
+			lookup = clear_data(request.POST.get('email'))
 
 			username = request.POST.get('username')
 			raw_password = request.POST.get('password1')
@@ -79,9 +74,9 @@ class SignupBot(APIView):
 	permission_classes = (IsAuthenticated,)
 	def post(self,request):
 		form = SignupForm(data=request.data)
-		huntercheck = emailcheck(request.data.get('email'))
+		huntercheck = email_check(request.data.get('email'))
 		if form.is_valid() and huntercheck == True:
-			lookup = clearData(request.data.get('email'))
+			lookup = clear_data(request.data.get('email'))
 
 			post_values = request.data.copy()
 			if post_values["givenName"] == "":
@@ -128,8 +123,6 @@ class LikeBot(APIView):
 		form = LikeForm(post_values)
 
 		if post_values["upvote"] == "True":	# Like comment
-			print("yeaaah, upvote!")
-
 			try:
 				Like.objects.get(user=liker.id, post=post.id)
 				return Response(print("You already liked it!" + str(liker.id) + " post - " + str(post.id)))
@@ -144,11 +137,8 @@ class LikeBot(APIView):
 				return Response(form.errors)
 
 		else:								# Unlike comment
-			print("Dislike!")
-
 			try:
 				like = Like.objects.get(user=liker.id, post=post.id)
-				print("got it")
 				like.delete()
 				liker.likes = liker.likes-1
 				liker.save()
